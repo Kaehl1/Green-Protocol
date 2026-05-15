@@ -19,6 +19,7 @@ public abstract class Entidad extends  ObjetoMapa{
         this.vidaActual = vidaMax;
         this.defensa = defensa;
         this.rangoMovimiento = rangoMovimiento;
+        this.movimientoActual = rangoMovimiento;
         this.dañoBase = dañoBase;
         this.estaVivo = true;
     }

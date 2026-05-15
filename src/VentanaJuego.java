@@ -10,78 +10,120 @@ public class VentanaJuego extends JFrame implements KeyListener {
     private JTextArea historialCombate;
     private JLabel etiquetaStatsHeroe;
     private JLabel etiquetaStatsJefe;
+    private CardLayout cardLayout;
+    private JPanel panelContenedor;
+    private JPanel panelJuego;
+    private JPanel panelMenu;
 
     // --- CONSTRUCTOR ---
     public VentanaJuego(Partida partida) {
         this.partida = partida;
-        // 1. Configuración de la Ventana
         setTitle("Green Protocol v1.0");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Al cerrar la 'X', se apaga el programa por completo
-        setResizable(false); // Bloquea el tamaño para evitar que el mapa se descuadre
-        setLayout(new BorderLayout());
-        // 2. Configuración del Lienzo
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        // --- SISTEMA DE CARTAS ---
+        cardLayout = new CardLayout();
+        panelContenedor = new JPanel(cardLayout);
+        add(panelContenedor);
+        // CREACIÓN DEL PANEL DE JUEGO
+        panelJuego = new JPanel(new BorderLayout());
+        // El Lienzo del Mapa
         areaTexto = new JTextArea();
-        areaTexto.setEditable(false); // El usuario no puede escribir ni borrar el mapa
-        areaTexto.setBackground(Color.BLACK); // Fondo negro
-        areaTexto.setForeground(Color.GREEN); // Texto verde
+        areaTexto.setEditable(false);
+        areaTexto.setBackground(Color.BLACK);
+        areaTexto.setForeground(Color.GREEN);
         areaTexto.setFont(new Font("Monospaced", Font.BOLD, 35));
-        // 3. Añadimos el lienzo a la ventana
         JPanel panelFondo = new JPanel(new GridBagLayout());
         panelFondo.setBackground(Color.BLACK);
         panelFondo.add(areaTexto);
-        add(panelFondo,  BorderLayout.CENTER);
-        // --- PANEL DERECHO: HISTORIAL CON TÍTULO ---
+        panelJuego.add(panelFondo, BorderLayout.CENTER); // <-- Añadido a panelJuego
+        // El Panel Derecho
         JPanel panelDerecho = new JPanel(new BorderLayout());
         panelDerecho.setBackground(Color.BLACK);
-        // Título personalizado
         JLabel tituloRegistro = new JLabel(" Registro de Batalla ");
         tituloRegistro.setFont(new Font("Monospaced", Font.BOLD, 14));
         tituloRegistro.setForeground(Color.GREEN);
         tituloRegistro.setBackground(Color.DARK_GRAY);
-        tituloRegistro.setOpaque(true); // Fondo gris visible
+        tituloRegistro.setOpaque(true);
         tituloRegistro.setHorizontalAlignment(SwingConstants.CENTER);
-        tituloRegistro.setBorder(BorderFactory.createLineBorder(Color.GREEN)); // Borde verde fino
-        // Área de texto del historial
+        tituloRegistro.setBorder(BorderFactory.createLineBorder(Color.GREEN));
         historialCombate = new JTextArea(10, 35);
         historialCombate.setEditable(false);
         historialCombate.setBackground(Color.DARK_GRAY);
         historialCombate.setForeground(Color.WHITE);
         historialCombate.setFont(new Font("Monospaced", Font.BOLD, 14));
         historialCombate.setMargin(new Insets(10, 10, 10, 10));
-        historialCombate.setLineWrap(true); // Activa el salto de línea automático al llegar al borde
-        historialCombate.setWrapStyleWord(true); // Obliga a que el salto se haga en espacios para no partir una palabra por la mitad
+        historialCombate.setLineWrap(true);
+        historialCombate.setWrapStyleWord(true);
         JScrollPane scrollHistorial = new JScrollPane(historialCombate);
         scrollHistorial.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-        // Montamos el panel derecho: título al NORTE, historial al CENTRO
         panelDerecho.add(tituloRegistro, BorderLayout.NORTH);
         panelDerecho.add(scrollHistorial, BorderLayout.CENTER);
-        add(panelDerecho, BorderLayout.EAST);
-        // --- PANEL INFERIOR: ESTADÍSTICAS EN DOS FILAS ---
-        // Usamos GridLayout(2, 1) para obligar a tener 2 filas (Héroe arriba, Jefe abajo)
+        panelJuego.add(panelDerecho, BorderLayout.EAST); // <-- Añadido a panelJuego
+        // El Panel Inferior
         JPanel panelInferior = new JPanel(new GridLayout(2, 1));
         panelInferior.setBackground(Color.DARK_GRAY);
         etiquetaStatsHeroe = new JLabel();
         etiquetaStatsJefe = new JLabel();
-        // Estilo para las etiquetas
         Font fuenteStats = new Font("Monospaced", Font.BOLD, 16);
         etiquetaStatsHeroe.setFont(fuenteStats);
         etiquetaStatsHeroe.setForeground(Color.YELLOW);
         etiquetaStatsHeroe.setHorizontalAlignment(SwingConstants.CENTER);
         etiquetaStatsJefe.setFont(fuenteStats);
-        etiquetaStatsJefe.setForeground(Color.ORANGE); // Naranja para el jefe resalta bien
+        etiquetaStatsJefe.setForeground(Color.ORANGE);
         etiquetaStatsJefe.setHorizontalAlignment(SwingConstants.CENTER);
         panelInferior.add(etiquetaStatsHeroe);
         panelInferior.add(etiquetaStatsJefe);
         panelInferior.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        add(panelInferior, BorderLayout.SOUTH);
-        // 5. Configuración del "Oído"
-        addKeyListener(this); // La ventana lee sus propias teclas
-        setFocusable(true); // Ventana foco de atención del teclado
-        // 6. Renderizado final
-        pack(); // Adapta la ventana al contenido inicial
-        setSize(1080, 900); // Tamaño de la ventana en pixeles
-        setLocationRelativeTo(null); // Centra la ventana en medio del monitor
-        setVisible(true); // Enciende la pantalla
+        panelJuego.add(panelInferior, BorderLayout.SOUTH); // <-- Añadido a panelJuego
+        // 2. CREACIÓN DEL PANEL DE MENÚ
+        panelMenu = new JPanel(new BorderLayout());
+        panelMenu.setBackground(Color.BLACK);
+        JTextArea textoMenu = new JTextArea();
+        textoMenu.setEditable(false);
+        textoMenu.setBackground(Color.BLACK);
+        textoMenu.setForeground(Color.GREEN);
+        textoMenu.setFont(new Font("Monospaced", Font.BOLD, 20));
+        textoMenu.setText("\n\n\n\n\n\n\n\n" +
+                "       _____                    _____           _                  _ \n" +
+                "      / ____|                  |  __ \\         | |                | |\n" +
+                "     | |  __ _ __ ___  ___ _ __| |__) | __ ___ | |_ ___   ___ ___ | |\n" +
+                "     | | |_ | '__/ _ \\/ _ \\ '_ \\  ___/ '__/ _ \\| __/ _ \\ / __/ _ \\| |\n" +
+                "     | |__| | | |  __/  __/ | | | |   | | | (_) | || (_) | (_| (_) | |\n" +
+                "      \\_____|_|  \\___|\\___|_| |_|_|   |_|  \\___/ \\__\\___/ \\___\\___/|_|\n" +
+                "\n\n\n\n\n" +
+                "                            [1] ¡JUGAR!\n" +
+                "                            [2] SALIR");
+        panelMenu.add(textoMenu, BorderLayout.CENTER);
+        // 2.5 CREACIÓN DEL PANEL DE SELECCIÓN (NUEVO)
+        JPanel panelSeleccion = new JPanel(new BorderLayout());
+        panelSeleccion.setBackground(Color.BLACK);
+        JTextArea textoSeleccion = new JTextArea();
+        textoSeleccion.setEditable(false);
+        textoSeleccion.setBackground(Color.BLACK);
+        textoSeleccion.setForeground(Color.GREEN);
+        textoSeleccion.setFont(new Font("Monospaced", Font.BOLD, 20));
+        textoSeleccion.setText("\n\n\n\n\n\n" +
+                "       >>> SELECCIONA TU CLASE <<<\n" +
+                "       ===========================\n\n" +
+                "       [1] GUERRERO : Mucho HP, Daño físico masivo con rabia.\n" +
+                "       [2] PALADÍN  : Equilibrado, Daño mágico con bendición.\n" +
+                "       [3] PÍCARO   : Frágil, Ataque doble por turno.\n" +
+                "       [4] Salir                                     \n4"+
+                "\n\n\n\n\n\n\n" +
+                "                          [ PULSA 1, 2 O 3 ]");
+        panelSeleccion.add(textoSeleccion, BorderLayout.CENTER);
+        // 3. AÑADIR PANELES AL CONTENEDOR Y MOSTRAR MENÚ
+        panelContenedor.add(panelMenu, "MENU");
+        panelContenedor.add(panelJuego, "JUEGO");
+        panelContenedor.add(panelSeleccion, "SELECCION");
+        cardLayout.show(panelContenedor, "MENU");
+        addKeyListener(this);
+        setFocusable(true);
+        pack();
+        setSize(1080, 900);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     // --- MÉTODOS DE LA INTERFAZ ---
@@ -112,6 +154,20 @@ public class VentanaJuego extends JFrame implements KeyListener {
     // Reemplaza todo el texto por "nada"
     public void limpiarHistorial() {
         historialCombate.setText("");
+    }
+
+    //Enseña el panel de menu
+    public void mostrarMenu() {
+        cardLayout.show(panelContenedor, "MENU");
+    }
+    //Enseña el panel de juego
+    public void mostrarJuego() {
+        cardLayout.show(panelContenedor, "JUEGO");
+    }
+
+    //Ensela el panel de seleccion
+    public void mostrarSeleccion() {
+        cardLayout.show(panelContenedor, "SELECCION");
     }
 
     // --- MÉTODOS DEL KEYLISTENER ---

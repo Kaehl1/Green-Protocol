@@ -2,6 +2,9 @@ import controladores.Controlador;
 import controladores.Jugador;
 import controladores.Maquina;
 import entidades.Entidad;
+import entidades.Guerrero;
+import entidades.Paladin;
+import entidades.Rogue;
 import escenario.Tablero;
 
 import java.awt.*;
@@ -16,6 +19,8 @@ public class Partida {
     private Entidad heroe;
     private Entidad jefe;
     private boolean juegoTerminado = false;
+    private boolean enMenu = true;
+    private boolean enSeleccion = false;
 
 
     public Partida(Tablero tablero, Entidad heroe, Entidad jefe) {
@@ -39,6 +44,9 @@ public class Partida {
             turnoActual = 0;
         }
         Controlador siguiente = controladores.get(turnoActual);
+        if(siguiente instanceof Jugador) {
+            heroe.reiniciarMovimiento();
+        }
         String reporte = siguiente.ejecutarTurno(this.tablero);
         if (reporte != null&& !reporte.isEmpty()) {
             this.registrarLog(reporte);
@@ -55,12 +63,40 @@ public class Partida {
     }
 
     public void gestionarTecla(int codigoTecla) {
-        if (juegoTerminado) {
-            if(codigoTecla == KeyEvent.VK_ENTER){
-                reiniciarPartida();
+        //En el menu principal
+        if(enMenu){
+            if(codigoTecla == KeyEvent.VK_1 || codigoTecla == KeyEvent.VK_NUMPAD1){
+                enMenu = false;
+                enSeleccion = true;
+                ventana.mostrarSeleccion();
+            } else if (codigoTecla == KeyEvent.VK_2 || codigoTecla == KeyEvent.VK_NUMPAD2) {
+                System.exit(0);
             }
             return;
         }
+        //En el menu de seleccion
+        if(enSeleccion){
+            if(codigoTecla == KeyEvent.VK_1 || codigoTecla == KeyEvent.VK_NUMPAD1){
+                configurarNuevaPartida(new Guerrero(0,0, "Heroe"));
+            } else if (codigoTecla == KeyEvent.VK_2 || codigoTecla == KeyEvent.VK_NUMPAD2) {
+                configurarNuevaPartida(new Paladin(0,0, "Heroe"));
+            } else if (codigoTecla == KeyEvent.VK_3 || codigoTecla == KeyEvent.VK_NUMPAD3) {
+                configurarNuevaPartida(new Rogue(0,0, "Heroe"));
+            } else if (codigoTecla == KeyEvent.VK_4 || codigoTecla == KeyEvent.VK_NUMPAD4) {
+                System.exit(0);
+            }
+            return;
+        }
+        //En el final de la partida
+        if (juegoTerminado) {
+            if(codigoTecla == KeyEvent.VK_ENTER){
+                juegoTerminado = false;
+                enMenu = true;
+                ventana.mostrarMenu();
+            }
+            return;
+        }
+        //Jugando
         Controlador actual = controladores.get(turnoActual);
         if (actual instanceof Jugador) {
             if(codigoTecla== KeyEvent.VK_E){
@@ -132,7 +168,8 @@ public class Partida {
                 "              ) (              \n" +
                 "            _.' '._            \n" +
                 "           `-------`           \n" +
-                "         ¡VICTORIA ÉPICA!       ";
+                "         ¡VICTORIA ÉPICA!      \n"+
+                "          [Pulsa ENTER]          ";
     }
 
     private String generarPantallaDerrota() {
@@ -147,7 +184,8 @@ public class Partida {
                 "      \\-------------------/      \n" +
                 "                                 \n" +
                 "          GAME OVER              \n" +
-                "       Has sido derrotado        ";
+                "       Has sido derrotado        \n"+
+                "         [Pulsa ENTER]            ";
     }
 
     private void refrescarInterfaz() {
@@ -168,6 +206,7 @@ public class Partida {
         ventana.cambiarColorMapa(java.awt.Color.GREEN);
         heroe.reiniciar();
         jefe.reiniciar();
+        heroe.reiniciarMovimiento();
         for (Controlador c : controladores) {
             if (c instanceof Maquina) {
                 ((Maquina) c).reiniciarControlador();
@@ -177,6 +216,17 @@ public class Partida {
         tablero.colocarEntidad(jefe, 9, 9);
         this.ventana.actualizarPantalla(actualizarMapa());
         this.refrescarInterfaz();
-        registrarLog("--- SISTEMA REINICIADO: NUEVA SIMULACIÓN ---");
+        registrarLog("SISTEMA: INICIANDO NUEVA SIMULACIÓN...");
+    }
+
+    private void configurarNuevaPartida(Entidad nuevaClase) {
+        this.heroe = nuevaClase;
+        this.controladores.clear();
+        this.controladores.add(new Jugador(this.heroe));
+        this.controladores.add(new Maquina(this.jefe, this.heroe));
+        this.enSeleccion = false;
+        this.enMenu = false;
+        reiniciarPartida();
+        ventana.mostrarJuego();
     }
 }
