@@ -1,6 +1,7 @@
 package entidades;
 
 
+import excepciones.AtaqueInvalidoException;
 
 public abstract class Entidad extends  ObjetoMapa{
     private String nombre;
@@ -50,6 +51,10 @@ public abstract class Entidad extends  ObjetoMapa{
         setDañoBase(dañoBase+aumento);
     }
 
+    public void bufarDefensa(int aumento){
+        setDefensa(this.defensa + aumento);
+    }
+
     public int obtenerDañoReal(){
         return dañoBase;
     }
@@ -64,14 +69,17 @@ public abstract class Entidad extends  ObjetoMapa{
         return true;
     }
 
-    public String atacar(Entidad objetivo){
-        if(puedeAtacar(objetivo)){
-            int vidaAntes = objetivo.getVidaActual();
-            objetivo.recibirDaño(obtenerDañoReal());
-            int dañoCausado = vidaAntes-objetivo.getVidaActual();
-            return this.getNombre()+" ataca a "+objetivo.getNombre()+" y causa "+dañoCausado+" de daño.";
+    public String atacar(Entidad objetivo) throws AtaqueInvalidoException {
+        if (!puedeAtacar(objetivo)) {
+            throw new excepciones.AtaqueInvalidoException("El enemigo está fuera de rango o la línea de visión está bloqueada.");
         }
-        return"";
+        if (!objetivo.getEstaVivo()) {
+            throw new excepciones.AtaqueInvalidoException("¡El enemigo ya está derrotado!");
+        }
+        int vidaAntes = objetivo.getVidaActual();
+        objetivo.recibirDaño(obtenerDañoReal());
+        int dañoCausado = vidaAntes-objetivo.getVidaActual();
+        return this.getNombre()+" ataca a "+objetivo.getNombre()+" y causa "+dañoCausado+" de daño.";
     }
 
     //movimiento

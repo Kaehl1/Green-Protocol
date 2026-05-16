@@ -6,11 +6,14 @@ import entidades.Guerrero;
 import entidades.Paladin;
 import entidades.Rogue;
 import escenario.Tablero;
+import excepciones.AtaqueInvalidoException;
+import excepciones.MovimientoInvalidoException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Partida {
     private VentanaJuego ventana;
@@ -22,6 +25,9 @@ public class Partida {
     private boolean juegoTerminado = false;
     private boolean enMenu = true;
     private boolean enSeleccion = false;
+    private int contadorTurnosPocion = 0;
+    private int turnosParaNuevaPocion = 0;
+    private Random rand = new Random();
 
 
     public Partida(Tablero tablero, Entidad heroe, Entidad jefe) {
@@ -45,6 +51,16 @@ public class Partida {
             turnoActual = 0;
         }
         Controlador siguiente = controladores.get(turnoActual);
+        if (siguiente instanceof Jugador) {
+            contadorTurnosPocion++;
+            if (contadorTurnosPocion >= turnosParaNuevaPocion) {
+                tablero.generarPocionAleatoria();
+                registrarLog("SISTEMA: Una nueva poción ha aparecido en la zona.");
+                ventana.actualizarPantalla(actualizarMapa());
+                contadorTurnosPocion = 0;
+                turnosParaNuevaPocion = rand.nextInt(5) + 4;
+            }
+        }
         if(siguiente instanceof Jugador) {
             heroe.reiniciarMovimiento();
             String reporte = siguiente.ejecutarTurno(this.tablero);
@@ -59,13 +75,18 @@ public class Partida {
                 this.registrarLog(reporteInicio);
             }
             this.refrescarInterfaz();
-            Timer timerMaquina = new Timer(400, e -> {
+            Timer timerMaquina = new Timer(400, evento -> {
                 boolean movido = maquina.intentarMover(this.tablero);
                 ventana.actualizarPantalla(actualizarMapa());
                 refrescarInterfaz();
                 if (!movido) {
-                    ((Timer) e.getSource()).stop();
-                    String textoAtaque = maquina.ejecutarAtaque();
+                    ((Timer) evento.getSource()).stop();
+                    String textoAtaque = null;
+                    try {
+                        textoAtaque = maquina.ejecutarAtaque();
+                    } catch (AtaqueInvalidoException e) {
+                        throw new RuntimeException(e);
+                    }
                     if (!textoAtaque.isEmpty()) {
                         registrarLog(textoAtaque);
                         refrescarInterfaz();
@@ -118,7 +139,7 @@ public class Partida {
         Controlador actual = controladores.get(turnoActual);
         if (actual instanceof Jugador) {
             if(codigoTecla== KeyEvent.VK_E){
-                if (heroe.puedeAtacar(jefe)){
+                try {
                     String reporteAtaque = heroe.atacar(jefe);
                     registrarLog(reporteAtaque);
                     this.refrescarInterfaz();
@@ -126,8 +147,8 @@ public class Partida {
                     if (!juegoTerminado){
                         avanzarTurno();
                     }
-                }else {
-                    registrarLog("El enemigo está demasiado lejos.");
+                } catch (excepciones.AtaqueInvalidoException e) {
+                    registrarLog("SISTEMA: " + e.getMessage());
                 }
             }else if (codigoTecla == KeyEvent.VK_ENTER) {
                 avanzarTurno();
@@ -138,16 +159,26 @@ public class Partida {
             }else {
                 int vidaAntes=heroe.getVidaActual();
                 int dañoAntes= heroe.getDañoBase();
-                ((Jugador) actual).procesarEntrada(codigoTecla, this.tablero);
+                int defensaAntes = heroe.getDefensa();
+                try {
+                    ((Jugador) actual).procesarEntrada(codigoTecla, this.tablero);
+                }catch (MovimientoInvalidoException e){
+                    registrarLog(e.getMessage());
+                }
                 int vidaDespues=heroe.getVidaActual();
                 int dañoDespues= heroe.getDañoBase();
+                int defensaDespues = heroe.getDefensa();
                 if(vidaDespues>vidaAntes){
                     int cura=vidaDespues-vidaAntes;
-                    registrarLog("¡Has recogido una pocion y te curas "+cura+"HP!");
+                    registrarLog("¡Has recogido una poción y te curas "+cura+"HP!");
                 }
                 if (dañoDespues>dañoAntes){
-                    int buff=dañoDespues-dañoAntes;
-                    registrarLog("¡Has recogido una pocion y tu daño aumenta "+buff+"!");
+                    int buffAtq=dañoDespues-dañoAntes;
+                    registrarLog("¡Has recogido una poción y tu daño aumenta "+buffAtq+"!");
+                }
+                if (defensaDespues>defensaAntes){
+                    int buffDef=defensaDespues-defensaAntes;
+                    registrarLog("¡Has recogido una poción y tu defensa aumenta "+buffDef+"!");
                 }
                 String mapaActualizado = actualizarMapa();
                 this.ventana.actualizarPantalla(mapaActualizado);
@@ -200,7 +231,6 @@ public class Partida {
                 "        |               |        \n" +
                 "      .-|               |-.      \n" +
                 "      \\-------------------/      \n" +
-                "                                 \n" +
                 "          GAME OVER              \n" +
                 "       Has sido derrotado        \n"+
                 "         [Pulsa ENTER]            ";
@@ -219,9 +249,15 @@ public class Partida {
     private void reiniciarPartida() {
         this.juegoTerminado = false;
         this.turnoActual = 0;
-        tablero.limpiarTablero();
+        tablero.generarMapaAleatorio();
         ventana.limpiarHistorial();
-        ventana.cambiarColorMapa(java.awt.Color.GREEN);
+        ventana.cambiarColorMapa(Color.GREEN);
+        int pocionesIniciales = rand.nextInt(3);
+        for(int i = 0; i < pocionesIniciales; i++){
+            tablero.generarPocionAleatoria();
+        }
+        turnosParaNuevaPocion = rand.nextInt(5) + 4;
+        contadorTurnosPocion = 0;
         heroe.reiniciar();
         jefe.reiniciar();
         heroe.reiniciarMovimiento();
@@ -230,8 +266,13 @@ public class Partida {
                 ((Maquina) c).reiniciarControlador();
             }
         }
-        tablero.colocarEntidad(heroe, 0, 0);
-        tablero.colocarEntidad(jefe, 9, 9);
+        int[] posHeroe = tablero.buscarCasillaVaciaAleatoria();
+        int[] posJefe;
+        do {
+            posJefe = tablero.buscarCasillaVaciaAleatoria();
+        } while (posJefe[0] == posHeroe[0] && posJefe[1] == posHeroe[1]);
+        tablero.colocarEntidad(heroe, posHeroe[0], posHeroe[1]);
+        tablero.colocarEntidad(jefe, posJefe[0], posJefe[1]);
         this.ventana.actualizarPantalla(actualizarMapa());
         this.refrescarInterfaz();
         registrarLog("SISTEMA: INICIANDO NUEVA SIMULACIÓN...");

@@ -18,7 +18,7 @@ public class Guerrero extends Entidad{
     @Override
     public String usarHabilidad() {
         this.rabiar();
-        return "¡"+getNombre()+" SANFADAO! Ten cuidadito.";
+        return "¡"+getNombre()+" DESATA TODA SU RABIA! Ten cuidado.";
     }
     @Override
     public String actualizarEstado() {

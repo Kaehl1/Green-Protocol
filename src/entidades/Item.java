@@ -21,13 +21,16 @@ public class Item extends ObjetoMapa{
         return "⛉";
     }
 
-    public void aplicarEfecto (Entidad objetivo){
+    public void aplicarEfecto(Entidad objetivo){
         switch (this.efecto){
             case VIDA:
                 objetivo.curar(this.cantidad);
                 break;
             case ATAQUE:
                 objetivo.bufarAtaque(this.cantidad);
+                break;
+            case DEFENSA:
+                objetivo.bufarDefensa(this.cantidad);
                 break;
         }
     }

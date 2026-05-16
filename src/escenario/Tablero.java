@@ -2,28 +2,100 @@ package escenario;
 
 import entidades.Entidad;
 import entidades.Item;
+import excepciones.MovimientoInvalidoException;
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
 
 public class Tablero {
     private int filas;
     private int columnas;
     private Casilla[][] casillas;
+    private boolean[][] muros;
 
-    public Tablero(int filas, int columnas) {
-        this.filas = filas;
-        this.columnas = columnas;
-        casillas = new Casilla[columnas][filas];
-        for (int i = 0; i < columnas; i++) {
-            for (int j = 0; j < filas; j++) {
-                casillas[i][j] = new Casilla();
+    public Tablero() {
+        generarMapaAleatorio();
+    }
+
+    public void generarMapaAleatorio() {
+        Random rand = new Random();
+        this.columnas = rand.nextInt(5) + 8;
+        this.filas = rand.nextInt(5) + 8;
+        do {
+            casillas = new Casilla[columnas][filas];
+            muros = new boolean[columnas][filas];
+            for (int x = 0; x < columnas; x++) {
+                for (int y = 0; y < filas; y++) {
+                    casillas[x][y] = new Casilla();
+                    // 15% de probabilidad de consolidar un muro insalvable
+                    if (rand.nextFloat() < 0.15f) {
+                        muros[x][y] = true;
+                    }
+                }
+            }
+        } while (!verificarConectividad()); // Reintenta el mapa si quedan áreas aisladas
+    }
+
+    private boolean verificarConectividad() {
+        int totalCaminables = 0;
+        int inicioX = -1;
+        int inicioY = -1;
+
+        for (int x = 0; x < columnas; x++) {
+            for (int y = 0; y < filas; y++) {
+                if (!muros[x][y]) {
+                    totalCaminables++;
+                    if (inicioX == -1) {
+                        inicioX = x;
+                        inicioY = y;
+                    }
+                }
+            }
+        }
+        if (totalCaminables == 0){
+            return false;
+        }
+        boolean[][] visitado = new boolean[columnas][filas];
+        Queue<int[]> cola = new LinkedList<>();
+        cola.add(new int[]{
+            inicioX, inicioY
+        });
+        visitado[inicioX][inicioY] = true;
+        int contados = 0;
+        int[] dx = {0, 0, 1, -1};
+        int[] dy = {1, -1, 0, 0};
+        while (!cola.isEmpty()) {
+            int[] actual = cola.poll();
+            contados++;
+            for (int i = 0; i < 4; i++) {
+                int nx = actual[0] + dx[i];
+                int ny = actual[1] + dy[i];
+
+                if (nx >= 0 && nx < columnas && ny >= 0 && ny < filas) {
+                    if (!muros[nx][ny] && !visitado[nx][ny]) {
+                        visitado[nx][ny] = true;
+                        cola.add(new int[]{nx, ny});
+                    }
+                }
+            }
+        }
+        return contados == totalCaminables;
+    }
+
+    public int[] buscarCasillaVaciaAleatoria() {
+        Random rand = new Random();
+        while (true) {
+            int x = rand.nextInt(columnas);
+            int y = rand.nextInt(filas);
+            if (!muros[x][y] && casillas[x][y].estaLibre()) {
+                return new int[]{x, y};
             }
         }
     }
 
     public boolean esCoordenadaValida(int x, int y){
-        if(x<0 || x>=columnas || y<0 || y>=filas){
-            return false;
-        }
-        return true;
+        return x >= 0 && x < columnas && y >= 0 && y < filas;
     }
 
     public Casilla obtenerCasilla(int x, int y){
@@ -34,10 +106,7 @@ public class Tablero {
     }
 
     public boolean colocarEntidad(Entidad entidad, int x, int y){
-        if(!esCoordenadaValida(x,y)){
-            return false;
-        }
-        if(!casillas[x][y].estaLibre()){
+        if(!esCoordenadaValida(x,y) || muros[x][y] || !casillas[x][y].estaLibre()){
             return false;
         }
         entidad.setX(x);
@@ -46,10 +115,10 @@ public class Tablero {
         return true;
     }
 
-    public boolean moverEntidad(Entidad entidad, Direccion direccion){
-        Casilla casillaActual=casillas[entidad.getX()][entidad.getY()];
-        int nuevaX =  entidad.getX();
-        int nuevaY =  entidad.getY();
+    public boolean moverEntidad(Entidad entidad, Direccion direccion) throws MovimientoInvalidoException {
+        Casilla casillaActual = casillas[entidad.getX()][entidad.getY()];
+        int nuevaX = entidad.getX();
+        int nuevaY = entidad.getY();
         switch (direccion){
             case NORTE:
                 nuevaY--;
@@ -64,8 +133,14 @@ public class Tablero {
                 nuevaX--;
                 break;
         }
-        if (!esCoordenadaValida(nuevaX, nuevaY) || !casillas[nuevaX][nuevaY].estaLibre()){
-            return false;
+        if (!esCoordenadaValida(nuevaX, nuevaY)){
+            throw new excepciones.MovimientoInvalidoException("¡Te sales de los límites del mapa!");
+        }
+        if (muros[nuevaX][nuevaY]){
+            throw new excepciones.MovimientoInvalidoException("¡Hay un obstáculo en tu camino!");
+        }
+        if (!casillas[nuevaX][nuevaY].estaLibre()){
+            throw new excepciones.MovimientoInvalidoException("¡Esa casilla ya está ocupada!");
         }
         entidad.setY(nuevaY);
         entidad.setX(nuevaX);
@@ -75,19 +150,40 @@ public class Tablero {
         if(item != null){
             item.aplicarEfecto(entidad);
             casillas[nuevaX][nuevaY].setObjeto(null);
-            System.out.println("Se ha recogido una poción de "+item.getEfecto());
         }
         return true;
+    }
+
+    public void generarPocionAleatoria() {
+        int[] pos = buscarCasillaVaciaAleatoria();
+        java.util.Random rand = new java.util.Random();
+        int tipo = rand.nextInt(3);
+        Item pocion = null;
+        switch (tipo) {
+            case 0:
+                pocion = new Item(pos[0], pos[1], entidades.EfectoPocion.VIDA, 20);
+                break;
+            case 1:
+                pocion = new Item(pos[0], pos[1], entidades.EfectoPocion.ATAQUE, 5);
+                break;
+            case 2:
+                pocion = new Item(pos[0], pos[1], entidades.EfectoPocion.DEFENSA, 5);
+                break;
+        }
+        casillas[pos[0]][pos[1]].setObjeto(pocion);
     }
 
     public String generarMapaTexto() {
         String mapa = "";
         for (int y = 0; y < this.filas; y++) {
             for (int x = 0; x < this.columnas; x++) {
-                Casilla casilla = casillas[x][y];
-                mapa=mapa+casilla.representar();
+                if (muros[x][y]) {
+                    mapa = mapa + "⛆"; // Carácter bloque sólido para el muro retro
+                } else {
+                    mapa = mapa + casillas[x][y].representar();
+                }
             }
-            mapa += "\n";
+            mapa = mapa + "\n";
         }
         return mapa;
     }
@@ -95,8 +191,10 @@ public class Tablero {
     public void limpiarTablero() {
         for (int x = 0; x < columnas; x++) {
             for (int y = 0; y < filas; y++) {
-                casillas[x][y].setPersonaje(null);
-                casillas[x][y].setObjeto(null); //borra ítems que no se recogieron
+                if (casillas[x][y] != null) {
+                    casillas[x][y].setPersonaje(null);
+                    casillas[x][y].setObjeto(null);
+                }
             }
         }
     }
