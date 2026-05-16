@@ -7,6 +7,7 @@ import entidades.Paladin;
 import entidades.Rogue;
 import escenario.Tablero;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -46,19 +47,36 @@ public class Partida {
         Controlador siguiente = controladores.get(turnoActual);
         if(siguiente instanceof Jugador) {
             heroe.reiniciarMovimiento();
-        }
-        String reporte = siguiente.ejecutarTurno(this.tablero);
-        if (reporte != null&& !reporte.isEmpty()) {
-            this.registrarLog(reporte);
-        }
-        this.refrescarInterfaz();
-        if (siguiente instanceof Maquina) {
-            this.ventana.actualizarPantalla(actualizarMapa());
-            this.refrescarInterfaz();
-            verificarFinPartida();
-            if (!juegoTerminado){
-                avanzarTurno();
+            String reporte = siguiente.ejecutarTurno(this.tablero);
+            if(reporte != null&&!reporte.isEmpty()){
+                this.registrarLog(reporte);
             }
+            this.refrescarInterfaz();
+        }else if (siguiente instanceof Maquina) {
+            Maquina maquina = (Maquina) siguiente;
+            String reporteInicio = maquina.ejecutarTurno(this.tablero);
+            if(reporteInicio != null&&!reporteInicio.isEmpty()){
+                this.registrarLog(reporteInicio);
+            }
+            this.refrescarInterfaz();
+            Timer timerMaquina = new Timer(400, e -> {
+                boolean movido = maquina.intentarMover(this.tablero);
+                ventana.actualizarPantalla(actualizarMapa());
+                refrescarInterfaz();
+                if (!movido) {
+                    ((Timer) e.getSource()).stop();
+                    String textoAtaque = maquina.ejecutarAtaque();
+                    if (!textoAtaque.isEmpty()) {
+                        registrarLog(textoAtaque);
+                        refrescarInterfaz();
+                        verificarFinPartida();
+                    }
+                    if (!juegoTerminado) {
+                        avanzarTurno();
+                    }
+                }
+            });
+            timerMaquina.start();
         }
     }
 

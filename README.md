@@ -25,6 +25,13 @@ v1.0 Primera version jugable. Se muestra el mapa estandar con posiciones predefi
 
 v1.0.1 Mejoras de interfaz
     
-    Se implementa el menú principal y la pantalla de selección de clase.
+    Se ha implementado el menú principal y la pantalla de selección de clase.
+
+---
+
+v1.1 Mejora de IA
+
+    Se han hecho cambios en el funcionamiento de la ejecucion del turno de la Maquina añadiendo un temporizador al mover
+    para que el jugador vea como la maquina mueve casilla a casilla.
 
 ---
