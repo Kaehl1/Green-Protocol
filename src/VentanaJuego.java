@@ -128,7 +128,7 @@ public class VentanaJuego extends JFrame implements KeyListener {
                 "       [1] GUERRERO : Mucho HP, Daño físico masivo con rabia.\n" +
                 "       [2] PALADÍN  : Equilibrado, Daño mágico con bendición.\n" +
                 "       [3] PÍCARO   : Frágil, Ataque doble por turno.\n" +
-                "       [4] Salir                                     \n4"+
+                "       [4] Salir                                     \n"+
                 "\n\n\n\n\n\n\n" +
                 "                                  [ PULSA 1, 2 O 3 ]");
         panelSeleccion.add(textoSeleccion, BorderLayout.CENTER);
@@ -187,6 +187,18 @@ public class VentanaJuego extends JFrame implements KeyListener {
     //Ensela el panel de seleccion
     public void mostrarSeleccion() {
         cardLayout.show(panelContenedor, "SELECCION");
+    }
+
+    public void mostrarPantallaNombre(String nombreTecleado) {
+        cambiarColorMapa(Color.GREEN);
+        String pantalla = "\n\n\n\n\n\n" +
+                "      ===============================\n" +
+                "             NOMBRA A TU HÉROE      \n" +
+                "      ===============================\n\n" +
+                "            Nombre: " + nombreTecleado + "_\n\n\n\n" +
+                "      [Escribe tu nombre y pulsa ENTER]\n" +
+                "         [Pulsa Retroceso para borrar]";
+        actualizarPantalla(pantalla);
     }
 
     // --- MÉTODOS DEL KEYLISTENER ---

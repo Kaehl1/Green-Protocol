@@ -25,9 +25,12 @@ public class Partida {
     private boolean juegoTerminado = false;
     private boolean enMenu = true;
     private boolean enSeleccion = false;
+    private boolean enIntroduccionNombre = false;
     private int contadorTurnosPocion = 0;
     private int turnosParaNuevaPocion = 0;
     private Random rand = new Random();
+    private String nombreUsuario="";
+    private Entidad claseElegidaTemp;
 
 
     public Partida(Tablero tablero, Entidad heroe, Entidad jefe) {
@@ -116,13 +119,48 @@ public class Partida {
         //En el menu de seleccion
         if(enSeleccion){
             if(codigoTecla == KeyEvent.VK_1 || codigoTecla == KeyEvent.VK_NUMPAD1){
-                configurarNuevaPartida(new Guerrero(0,0, "Heroe"));
+                this.claseElegidaTemp = new Guerrero(0,0, "Heroe");
+                this.enSeleccion = false;
+                this.enIntroduccionNombre = true;
+                ventana.mostrarJuego();
+                ventana.mostrarPantallaNombre(nombreUsuario);
             } else if (codigoTecla == KeyEvent.VK_2 || codigoTecla == KeyEvent.VK_NUMPAD2) {
-                configurarNuevaPartida(new Paladin(0,0, "Heroe"));
+                this.claseElegidaTemp = new Paladin(0,0, "Heroe");
+                this.enSeleccion = false;
+                this.enIntroduccionNombre = true;
+                ventana.mostrarJuego();
+                ventana.mostrarPantallaNombre(nombreUsuario);
             } else if (codigoTecla == KeyEvent.VK_3 || codigoTecla == KeyEvent.VK_NUMPAD3) {
-                configurarNuevaPartida(new Rogue(0,0, "Heroe"));
+                this.claseElegidaTemp = new Rogue(0,0, "Heroe");
+                this.enSeleccion = false;
+                this.enIntroduccionNombre = true;
+                ventana.mostrarJuego();
+                ventana.mostrarPantallaNombre(nombreUsuario);
             } else if (codigoTecla == KeyEvent.VK_4 || codigoTecla == KeyEvent.VK_NUMPAD4) {
                 System.exit(0);
+            }
+            return;
+        }
+        //En la introduccion de nombre
+        if(enIntroduccionNombre){
+            // Si pulsa Enter y ha escrito algo
+            if (codigoTecla == KeyEvent.VK_ENTER && nombreUsuario.length() > 0) {
+                claseElegidaTemp.setNombre(nombreUsuario); // Bautizamos al héroe
+                configurarNuevaPartida(claseElegidaTemp);   // ¡Arrancamos el juego!
+            }
+            // Si pulsa Borrar (Backspace)
+            else if (codigoTecla == KeyEvent.VK_BACK_SPACE && nombreUsuario.length() > 0) {
+                nombreUsuario = nombreUsuario.substring(0, nombreUsuario.length() - 1);
+                ventana.mostrarPantallaNombre(nombreUsuario); // Refrescamos pantalla
+            }
+            // Si pulsa una letra de la A a la Z
+            else if (codigoTecla >= 65 && codigoTecla <= 90) {
+                // Limitamos a 10 letras para que no rompa la UI
+                if (nombreUsuario.length() < 10) {
+                    nombreUsuario += (char) codigoTecla;
+                    nombreUsuario = Utiles.primeraMayus(nombreUsuario);
+                    ventana.mostrarPantallaNombre(nombreUsuario); // Refrescamos pantalla
+                }
             }
             return;
         }
@@ -147,7 +185,7 @@ public class Partida {
                     if (!juegoTerminado){
                         avanzarTurno();
                     }
-                } catch (excepciones.AtaqueInvalidoException e) {
+                } catch (AtaqueInvalidoException e) {
                     registrarLog("SISTEMA: " + e.getMessage());
                 }
             }else if (codigoTecla == KeyEvent.VK_ENTER) {
@@ -222,12 +260,18 @@ public class Partida {
     }
 
     private String generarPantallaDerrota() {
+        String nombre = this.heroe.getNombre();
+        int espaciosTotales = 15 - nombre.length();
+        int espaciosIzquierda = espaciosTotales / 2;
+        int espaciosDerecha = espaciosTotales - espaciosIzquierda;
+        String nombreCentrado = " ".repeat(espaciosIzquierda) + nombre + " ".repeat(espaciosDerecha);
+
         return "\n\n" +
                 "           .---------.           \n" +
                 "          /           \\          \n" +
                 "         /    R.I.P    \\         \n" +
                 "        |               |        \n" +
-                "        |     KAEHL     |        \n" +
+                "        |" + nombreCentrado + "|        \n" +
                 "        |               |        \n" +
                 "      .-|               |-.      \n" +
                 "      \\-------------------/      \n" +
@@ -279,12 +323,28 @@ public class Partida {
     }
 
     private void configurarNuevaPartida(Entidad nuevaClase) {
+        String[]nombres={"Vaarun", "Orionis", "Malakor", "Krux", "Bazaal"};
+        int indiceNombre = rand.nextInt(nombres.length);
+        String nombre = nombres[indiceNombre];
+        int claseJefe = rand.nextInt(3);
+        switch (claseJefe){
+            case 0:
+                this.jefe = new Guerrero(0,0, nombre);
+                break;
+            case 1:
+                this.jefe = new Paladin(0,0, nombre);
+                break;
+            case 2:
+                this.jefe = new Rogue(0,0, nombre);
+                break;
+        }
         this.heroe = nuevaClase;
         this.controladores.clear();
         this.controladores.add(new Jugador(this.heroe));
         this.controladores.add(new Maquina(this.jefe, this.heroe));
         this.enSeleccion = false;
         this.enMenu = false;
+        this.enIntroduccionNombre = false;
         reiniciarPartida();
         ventana.mostrarJuego();
     }
