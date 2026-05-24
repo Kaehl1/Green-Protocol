@@ -24,6 +24,7 @@ Durante tu turno en el mapa, puedes realizar las siguientes acciones utilizando 
 * **Desplazamiento:** Teclas `W` (Norte), `A` (Oeste), `S` (Sur) y `D` (Este).
 * **Ataque Base:** Tecla `E` (Requiere que el enemigo esté en rango de ataque y sin muros de por medio).
 * **Habilidad Especial:** Tecla `R` (Disponible actualmente para las clases Guerrero y Paladín).
+* **Terminar Turno:** Tecla `ENTER` / `INTRO`
 
 ### Leyenda del Mapa
 
