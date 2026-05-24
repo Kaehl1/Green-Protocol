@@ -1,6 +1,8 @@
 package entidades;
 
 
+import excepciones.AtaqueInvalidoException;
+
 public class Paladin extends Entidad{
     private boolean estaBendecido;
     public int turnosBendicion;
@@ -17,7 +19,7 @@ public class Paladin extends Entidad{
 
     public String usarHabilidad(){
         this.bendicionMagica();
-        return"¡"+getNombre()+" SA BENDESIDO! Ten cuidadito.";
+        return"¡La Luz bendice a "+getNombre()+"! Ten cuidado.";
     }
 
     @Override
@@ -46,13 +48,13 @@ public class Paladin extends Entidad{
     }
 
     @Override
-    public String atacar(Entidad objetivo) {
+    public String atacar(Entidad objetivo) throws AtaqueInvalidoException {
         if(estaBendecido){
             if (puedeAtacar(objetivo)) {
                 int vidaAntes = objetivo.getVidaActual();
                 objetivo.recibirDañoMagico(this.getDañoBase());
                 int dañoCausado = vidaAntes-objetivo.getVidaActual();
-                return this.getNombre() + " usa luz celestial sobre " + objetivo.getNombre() + " (" + dañoCausado + " daño).";
+                return this.getNombre() + " usa su arma resplandeciente sobre " + objetivo.getNombre() + " (" + dañoCausado + " daño).";
             }
         }else {
             return super.atacar(objetivo);

@@ -2,6 +2,7 @@ package controladores;
 
 import entidades.Entidad;
 import escenario.Tablero;
+import excepciones.MovimientoInvalidoException;
 
 public class Jugador extends Controlador {
     public Jugador(Entidad personaje) {
@@ -14,7 +15,7 @@ public class Jugador extends Controlador {
         return personaje.actualizarEstado();
     }
 
-    public void procesarEntrada(int codigoTecla, Tablero tablero) {
+    public void procesarEntrada(int codigoTecla, Tablero tablero) throws MovimientoInvalidoException {
         if(codigoTecla == java.awt.event.KeyEvent.VK_W || codigoTecla == java.awt.event.KeyEvent.VK_S || codigoTecla == java.awt.event.KeyEvent.VK_A || codigoTecla == java.awt.event.KeyEvent.VK_D){
             if(personaje.getMovimientoActual()>0){
                 boolean movido = false;

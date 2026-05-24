@@ -1,0 +1,96 @@
+/*GENERAL*/
+body {
+    background-color: #050505;
+    color: #39ff14;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 2fr 1fr; /*2 partes izq, 1 parte der*/
+    gap: 40px; /*Espacio entre columnas*/
+    align-items: start; /*Para que ambos bloques empiecen desde arriba*/
+}
+
+.resumen{
+    display:flex;
+    justify-content: space-around;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/*TABLA LOGROS(izquierda)*/
+table {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #39ff14;
+}
+
+th {
+    background-color: #1a1a1a;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+tr:hover {
+    background-color: #113311;
+}
+
+.nombre-logro{
+    text-transform: uppercase;
+}
+
+.titulo-logros {
+    text-align: center;
+    border-bottom: 2px solid #39ff14;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+/*HISTORIAL(derecha)*/
+.historial {
+    grid-column: 2;
+    grid-row: 1;
+    border-left: 2px dashed #39ff14;
+    padding-left: 30px;
+}
+
+.titulo-historial {
+    text-align: center;
+    border-bottom: 2px solid #39ff14;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.partida {
+    background-color: #000;
+    border: 1px solid #39ff14;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.partida h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #1a6b0c;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.partida li {
+    list-style-type: none;
+    padding: 8px 0;
+    border-bottom: 1px dashed #1a6b0c;
+}
+
+.partida li:last-child {
+    border-bottom: none;
+}

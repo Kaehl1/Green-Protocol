@@ -6,7 +6,7 @@ public class Guerrero extends Entidad{
     public int turnosRabia;
 
     public Guerrero(int posX, int posY, String nombre) {
-        super(posX, posY, nombre, 120, 15, 3, 25);
+        super(posX, posY, nombre, 120, 15, 2, 22);
         estaRabioso=false;
         turnosRabia=2;
     }
@@ -18,7 +18,7 @@ public class Guerrero extends Entidad{
     @Override
     public String usarHabilidad() {
         this.rabiar();
-        return "¡"+getNombre()+" SANFADAO! Ten cuidadito.";
+        return "¡"+getNombre()+" DESATA TODA SU RABIA! Ten cuidado.";
     }
     @Override
     public String actualizarEstado() {
@@ -48,7 +48,7 @@ public class Guerrero extends Entidad{
     @Override
     public int obtenerDañoReal() {
         if(estaRabioso){
-            return dañoBase*2;
+            return (int)(dañoBase*1.5);
         }
         return dañoBase;
     }

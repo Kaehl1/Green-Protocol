@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="./GreenProtocol.xsl" type="text/xsl"?>
+<perfil xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./SchemaSalami.xsd">
+    <usuario>Kaehl</usuario>
+    <juego nombre="Green Protocol">
+        <partidas>
+        </partidas>
+        <logros>
+            <logro puntos="5" completado="no" secreto="no">
+                <nombre>Alcóholico</nombre>
+                <descripcion>Has consumido una poción</descripcion>
+            </logro>
+            <logro puntos="5" completado="no" secreto="no">
+                <nombre>¿Y este botón que hace?</nombre>
+                <descripcion>Has utilizado tu habilidad especial</descripcion>
+            </logro>
+            <logro puntos="5" completado="no" secreto="no">
+                <nombre>La primera regla</nombre>
+                <descripcion>Has jugado tu primera partida</descripcion>
+            </logro>
+            <logro puntos="5" completado="no" secreto="no">
+                <nombre>Bautismo de acero</nombre>
+                <descripcion>Has jugado una partida siendo Guerrero</descripcion>
+            </logro>
+            <logro puntos="5" completado="no" secreto="no">
+                <nombre>Cruzada personal</nombre>
+                <descripcion>Has jugado una partida siendo Paladin</descripcion>
+            </logro>
+            <logro puntos="5" completado="no" secreto="no">
+                <nombre>Presentación de credenciales</nombre>
+                <descripcion>Has jugado una partida siendo Pícaro</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>Dominio del ring</nombre>
+                <descripcion>Has ganado tu primera partida</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>La senda de la espada</nombre>
+                <descripcion>Has ganado tu primera partida siendo Guerrero</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>Caminante del sol</nombre>
+                <descripcion>Has ganado tu primera partida siendo Paladín</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>Veneno en las venas</nombre>
+                <descripcion>Has ganado tu primera partida siendo Pícaro</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>Chatarra</nombre>
+                <descripcion>Has ganado tu primera partida a un jefe Guerrero</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>Hereje</nombre>
+                <descripcion>Has ganado tu primera partida a un jefe Paladín</descripcion>
+            </logro>
+            <logro puntos="10" completado="no" secreto="no">
+                <nombre>Caza-ratas</nombre>
+                <descripcion>Has ganado tu primera partida a un jefe Pícaro</descripcion>
+            </logro>
+            <logro puntos="15" completado="no" secreto="no">
+                <nombre>Bajo control</nombre>
+                <descripcion>Ganar una partida con 10HP o menos</descripcion>
+            </logro>
+            <logro puntos="15" completado="no" secreto="no">
+                <nombre>Depredador Herido</nombre>
+                <descripcion>Ganar una partida con 65HP o más</descripcion>
+            </logro>
+            <logro puntos="25" completado="no" secreto="si">
+                <nombre>Freno facial</nombre>
+                <descripcion>Has chocado contra un muro</descripcion>
+            </logro>
+            <logro puntos="25" completado="no" secreto="si">
+                <nombre>Fantasma del ring</nombre>
+                <descripcion>Has ganado una partida sin recibir daño</descripcion>
+            </logro>
+        </logros>
+    </juego>
+</perfil>
