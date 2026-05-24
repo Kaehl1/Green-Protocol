@@ -9,21 +9,21 @@ public class Rogue extends Entidad{
     @Override
     public String atacar(Entidad objetivo) {
         if(puedeAtacar(objetivo)){
-            // --- PRIMER GOLPE ---
-            int vidaAntesPrimero = objetivo.getVidaActual(); // Miramos la vida antes de tocarle
+            //PRIMER GOLPE
+            int vidaAntesPrimero = objetivo.getVidaActual();
             int dañoPrimero = (int) (this.dañoBase * 0.60);
             objetivo.recibirDaño(dañoPrimero);
-            int dañoCausadoPrimero = vidaAntesPrimero - objetivo.getVidaActual(); // Calculamos el daño real del primer tajo
-            String reporte = this.getNombre() + " asesta un tajo rápido a " + objetivo.getNombre() + " (" + dañoCausadoPrimero + " daño).";// Preparamos la primera parte del mensaje
+            int dañoCausadoPrimero = vidaAntesPrimero - objetivo.getVidaActual();
+            String reporte = this.getNombre() + " asesta un tajo rápido a " + objetivo.getNombre() + " (" + dañoCausadoPrimero + " daño).";
             if(!objetivo.getEstaVivo()){
-                return reporte + " ¡" + objetivo.getNombre() + " cae fulminado!"; // Si el enemigo muere con este primer golpe, no damos el segundo. Devolvemos el texto y paramos.
+                return reporte + " ¡" + objetivo.getNombre() + " cae fulminado!";
             }
-            // --- SEGUNDO GOLPE ---
-            int vidaAntesSegurndo = objetivo.getVidaActual(); // Volvemos a mirar la vida
+            //SEGUNDO GOLPE
+            int vidaAntesSegurndo = objetivo.getVidaActual();
             int dañoSegundo = (int) (this.dañoBase * 0.45);
             objetivo.recibirDaño(dañoSegundo);
-            int dañoCausadoSegundo = vidaAntesSegurndo - objetivo.getVidaActual(); // Calculamos el daño real del segundo tajo
-            reporte = reporte + "\n > " + this.getNombre() + " remata con un segundo golpe (" + dañoCausadoSegundo + " daño)."; // Sumamos el segundo golpe al texto original
+            int dañoCausadoSegundo = vidaAntesSegurndo - objetivo.getVidaActual();
+            reporte = reporte + "\n > " + this.getNombre() + " remata con un segundo golpe (" + dañoCausadoSegundo + " daño).";
             return reporte;
         }
         return "";

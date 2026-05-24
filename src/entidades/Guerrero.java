@@ -26,7 +26,7 @@ public class Guerrero extends Entidad{
             turnosRabia--;
             if (turnosRabia <= 0) {
                 estaRabioso = false;
-                turnosRabia = 2; // Lo reiniciamos por si vuelve a usar la habilidad
+                turnosRabia = 2;
                 return"¡" + getNombre() + " se ha calmado! Su daño vuelve a la normalidad.";
             }
         }

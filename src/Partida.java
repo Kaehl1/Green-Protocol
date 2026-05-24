@@ -145,23 +145,19 @@ public class Partida {
         }
         //En la introduccion de nombre
         if(enIntroduccionNombre){
-            // Si pulsa Enter y ha escrito algo
             if (codigoTecla == KeyEvent.VK_ENTER && nombreUsuario.length() > 0) {
-                claseElegidaTemp.setNombre(nombreUsuario); // Bautizamos al héroe
-                configurarNuevaPartida(claseElegidaTemp);   // ¡Arrancamos el juego!
+                claseElegidaTemp.setNombre(nombreUsuario);
+                configurarNuevaPartida(claseElegidaTemp);
             }
-            // Si pulsa Borrar (Backspace)
             else if (codigoTecla == KeyEvent.VK_BACK_SPACE && nombreUsuario.length() > 0) {
                 nombreUsuario = nombreUsuario.substring(0, nombreUsuario.length() - 1);
-                ventana.mostrarPantallaNombre(nombreUsuario); // Refrescamos pantalla
+                ventana.mostrarPantallaNombre(nombreUsuario);
             }
-            // Si pulsa una letra de la A a la Z
             else if (codigoTecla >= 65 && codigoTecla <= 90) {
-                // Limitamos a 10 letras para que no rompa la UI
                 if (nombreUsuario.length() < 10) {
                     nombreUsuario += (char) codigoTecla;
                     nombreUsuario = Utiles.primeraMayus(nombreUsuario);
-                    ventana.mostrarPantallaNombre(nombreUsuario); // Refrescamos pantalla
+                    ventana.mostrarPantallaNombre(nombreUsuario);
                 }
             }
             return;

@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class VentanaJuego extends JFrame implements KeyListener {
-    // --- ATRIBUTOS ---
     private JTextArea areaTexto;
     private Partida partida;
     private JTextArea historialCombate;
@@ -37,7 +36,7 @@ public class VentanaJuego extends JFrame implements KeyListener {
         JPanel panelFondo = new JPanel(new GridBagLayout());
         panelFondo.setBackground(Color.BLACK);
         panelFondo.add(areaTexto);
-        panelJuego.add(panelFondo, BorderLayout.CENTER); // <-- Añadido a panelJuego
+        panelJuego.add(panelFondo, BorderLayout.CENTER); //Añadido a panelJuego
         //Historial de combate
         historialCombate = new JTextArea(6,50);
         historialCombate.setEditable(false);
@@ -51,31 +50,6 @@ public class VentanaJuego extends JFrame implements KeyListener {
         scrollHistorial.setBackground(Color.BLACK);
         scrollHistorial.getViewport().setBackground(Color.BLACK);
         scrollHistorial.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GREEN), " Registro de Batalla ", TitledBorder.CENTER, TitledBorder.TOP, new Font("Monospaced", Font.BOLD, 14), Color.GREEN));
-        //Estadisticas
-        /*// El Panel Derecho
-        JPanel panelDerecho = new JPanel(new BorderLayout());
-        panelDerecho.setBackground(Color.BLACK);
-        JLabel tituloRegistro = new JLabel(" Registro de Batalla ");
-        tituloRegistro.setFont(new Font("Monospaced", Font.BOLD, 14));
-        tituloRegistro.setForeground(Color.GREEN);
-        tituloRegistro.setBackground(Color.DARK_GRAY);
-        tituloRegistro.setOpaque(true);
-        tituloRegistro.setHorizontalAlignment(SwingConstants.CENTER);
-        tituloRegistro.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-        historialCombate = new JTextArea(10, 35);
-        historialCombate.setEditable(false);
-        historialCombate.setBackground(Color.DARK_GRAY);
-        historialCombate.setForeground(Color.WHITE);
-        historialCombate.setFont(new Font("Monospaced", Font.BOLD, 14));
-        historialCombate.setMargin(new Insets(10, 10, 10, 10));
-        historialCombate.setLineWrap(true);
-        historialCombate.setWrapStyleWord(true);
-        JScrollPane scrollHistorial = new JScrollPane(historialCombate);
-        scrollHistorial.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-        panelDerecho.add(tituloRegistro, BorderLayout.NORTH);
-        panelDerecho.add(scrollHistorial, BorderLayout.CENTER);
-        panelJuego.add(panelDerecho, BorderLayout.EAST); // <-- Añadido a panelJuego
-        */
         // El Panel Inferior
         JPanel panelInferior = new JPanel(new GridLayout(2, 1));
         panelInferior.setBackground(Color.DARK_GRAY);
@@ -95,7 +69,7 @@ public class VentanaJuego extends JFrame implements KeyListener {
         panelSurGlobal.add(scrollHistorial, BorderLayout.CENTER);
         panelSurGlobal.add(panelInferior, BorderLayout.SOUTH);
         panelJuego.add(panelSurGlobal, BorderLayout.SOUTH);
-        // 2. CREACIÓN DEL PANEL DE MENÚ
+        // CREACIÓN DEL PANEL DE MENÚ
         panelMenu = new JPanel(new BorderLayout());
         panelMenu.setBackground(Color.BLACK);
         JTextArea textoMenu = new JTextArea();
@@ -114,7 +88,7 @@ public class VentanaJuego extends JFrame implements KeyListener {
                 "                                     [1] ¡JUGAR!\n" +
                 "                                     [2] SALIR");
         panelMenu.add(textoMenu, BorderLayout.CENTER);
-        // 2.5 CREACIÓN DEL PANEL DE SELECCIÓN (NUEVO)
+        // CREACIÓN DEL PANEL DE SELECCIÓN
         JPanel panelSeleccion = new JPanel(new BorderLayout());
         panelSeleccion.setBackground(Color.BLACK);
         JTextArea textoSeleccion = new JTextArea();
@@ -132,7 +106,7 @@ public class VentanaJuego extends JFrame implements KeyListener {
                 "\n\n\n\n\n\n\n" +
                 "                                  [ PULSA 1, 2 O 3 ]");
         panelSeleccion.add(textoSeleccion, BorderLayout.CENTER);
-        // 3. AÑADIR PANELES AL CONTENEDOR Y MOSTRAR MENÚ
+        // AÑADIR PANELES AL CONTENEDOR Y MOSTRAR MENÚ
         panelContenedor.add(panelMenu, "MENU");
         panelContenedor.add(panelJuego, "JUEGO");
         panelContenedor.add(panelSeleccion, "SELECCION");
@@ -146,45 +120,37 @@ public class VentanaJuego extends JFrame implements KeyListener {
     }
 
     // --- MÉTODOS DE LA INTERFAZ ---
-    // Dibuja el mapa de texto en la pantalla
     public void actualizarPantalla(String mapaTexto) {
         areaTexto.setText(mapaTexto);
     }
 
-    // Actualiza los textos de vida y estados
     public void actualizarStats(String textoHeroe, String textoJefe) {
         etiquetaStatsHeroe.setText(textoHeroe);
         etiquetaStatsJefe.setText(textoJefe);
     }
-    //Imprime los eventos en el registro de batalla
     public void imprimirLog(String mensaje) {
         if (mensaje != null && !mensaje.isEmpty()) {
             historialCombate.append(" > " + mensaje + "\n");
-            // Autoscroll hacia abajo
             historialCombate.setCaretPosition(historialCombate.getDocument().getLength());
         }
     }
 
-    // Cambia el color del texto del mapa. Para el final de la partida.
     public void cambiarColorMapa(Color color) {
         areaTexto.setForeground(color);
     }
 
-    // Reemplaza todo el texto por "nada"
     public void limpiarHistorial() {
         historialCombate.setText("");
     }
 
-    //Enseña el panel de menu
     public void mostrarMenu() {
         cardLayout.show(panelContenedor, "MENU");
     }
-    //Enseña el panel de juego
+
     public void mostrarJuego() {
         cardLayout.show(panelContenedor, "JUEGO");
     }
 
-    //Ensela el panel de seleccion
     public void mostrarSeleccion() {
         cardLayout.show(panelContenedor, "SELECCION");
     }
@@ -204,9 +170,7 @@ public class VentanaJuego extends JFrame implements KeyListener {
     // --- MÉTODOS DEL KEYLISTENER ---
     @Override
     public void keyPressed(KeyEvent e) {
-        // 1. Captura el código numérico de la tecla que se pulsa
         int codigoTecla = e.getKeyCode();
-        // 2. Usamos el cable de comunicación con Partida pasándole la tecla exacta.
         partida.gestionarTecla(codigoTecla);
     }
 

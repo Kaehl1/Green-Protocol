@@ -28,13 +28,12 @@ public class Tablero {
             for (int x = 0; x < columnas; x++) {
                 for (int y = 0; y < filas; y++) {
                     casillas[x][y] = new Casilla();
-                    // 15% de probabilidad de consolidar un muro insalvable
                     if (rand.nextFloat() < 0.15f) {
                         muros[x][y] = true;
                     }
                 }
             }
-        } while (!verificarConectividad()); // Reintenta el mapa si quedan áreas aisladas
+        } while (!verificarConectividad());
     }
 
     private boolean verificarConectividad() {
@@ -178,7 +177,7 @@ public class Tablero {
         for (int y = 0; y < this.filas; y++) {
             for (int x = 0; x < this.columnas; x++) {
                 if (muros[x][y]) {
-                    mapa = mapa + "⛆"; // Carácter bloque sólido para el muro retro
+                    mapa = mapa + "⛆";
                 } else {
                     mapa = mapa + casillas[x][y].representar();
                 }
