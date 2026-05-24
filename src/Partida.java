@@ -31,6 +31,7 @@ public class Partida {
     private Random rand = new Random();
     private String nombreUsuario="";
     private Entidad claseElegidaTemp;
+    private int turnosTotales = 0;
 
 
     public Partida(Tablero tablero, Entidad heroe, Entidad jefe) {
@@ -55,6 +56,7 @@ public class Partida {
         }
         Controlador siguiente = controladores.get(turnoActual);
         if (siguiente instanceof Jugador) {
+            this.turnosTotales++;
             contadorTurnosPocion++;
             if (contadorTurnosPocion >= turnosParaNuevaPocion) {
                 tablero.generarPocionAleatoria();
@@ -235,15 +237,24 @@ public class Partida {
             registrarLog(">>> GAME OVER: El héroe ha caído...");
             ventana.cambiarColorMapa(Color.RED);
             ventana.actualizarPantalla(generarPantallaDerrota());
+            datos.GestorEstadisticas gestor = new datos.GestorEstadisticas();
+            String idPartida = gestor.obtenerSiguienteId(); // <-- Pedimos el ID secuencial
+            datos.RegistroPartida registro = new datos.RegistroPartida(idPartida, heroe.getNombre(), heroe.getClass().getSimpleName(), jefe.getNombre(), jefe.getClass().getSimpleName(), 0);
+            gestor.guardarPartida(registro);
         } else if (!jefe.getEstaVivo()) {
             juegoTerminado = true;
-            registrarLog(">>> ¡VICTORIA! La amenaza ha sido eliminada.");
+            int puntosFinales = Math.max(0, 1000 - (this.turnosTotales * 10));
+            registrarLog(">>> ¡VICTORIA! La amenaza ha sido eliminada en "+this.turnosTotales+" turnos.");
             ventana.cambiarColorMapa(Color.YELLOW);
-            ventana.actualizarPantalla(generarPantallaVictoria());
+            ventana.actualizarPantalla(generarPantallaVictoria(puntosFinales));
+            datos.GestorEstadisticas gestor = new datos.GestorEstadisticas();
+            String idPartida = gestor.obtenerSiguienteId(); // <-- Pedimos el ID secuencial
+            datos.RegistroPartida registro = new datos.RegistroPartida(idPartida, heroe.getNombre(), heroe.getClass().getSimpleName(), jefe.getNombre(), jefe.getClass().getSimpleName(), puntosFinales);
+            gestor.guardarPartida(registro);
         }
     }
 
-    private String generarPantallaVictoria() {
+    private String generarPantallaVictoria(int puntos) {
         return "\n\n" +
                 "          ___________          \n" +
                 "         '._==_==_=_.'         \n" +
@@ -255,7 +266,8 @@ public class Partida {
                 "              ) (              \n" +
                 "            _.' '._            \n" +
                 "           `-------`           \n" +
-                "         ¡VICTORIA ÉPICA!      \n"+
+                "         ¡VICTORIA ÉPICA!      \n" +
+                "         PUNTUACIÓN: " + puntos + "      \n"+
                 "          [Pulsa ENTER]          ";
     }
 
@@ -293,6 +305,7 @@ public class Partida {
     private void reiniciarPartida() {
         this.juegoTerminado = false;
         this.turnoActual = 0;
+        this.turnosTotales = 0;
         tablero.generarMapaAleatorio();
         ventana.limpiarHistorial();
         ventana.cambiarColorMapa(Color.GREEN);

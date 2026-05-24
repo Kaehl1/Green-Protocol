@@ -39,6 +39,24 @@ Durante tu turno en el mapa, puedes realizar las siguientes acciones utilizando 
 
 ## Historial de Versiones (Changelog)
 
+v3.0 Persistencia de Datos y Sistema de Puntuación.
+
+    Se ha completado el desarrollo del proyecto integrando el motor de persistencia y optimizando la experiencia competitiva:
+    
+    - Base de Datos XML: Integración nativa de un motor de persistencia que guarda automáticamente el historial de tus victorias, derrotas y estadísticas en un archivo `GreenProtocol.xml` al finalizar cada combate.
+    - Sistema de Puntuación Contrarreloj: Mecánica que calcula tus puntos al ganar en función de la rapidez. ¡Cuantos menos turnos tardes en derrotar al jefe, más puntos conseguirás!
+    - Visor Web de Estadísticas: Mediante XSLT y CSS, el archivo XML se puede abrir directamente en el navegador para visualizar una interfaz gráfica con tu historial completo de partidas y el registro de logros.
+
+---
+
+v2.1 Personalización y Jefes Aleatorios.
+
+    Se han añadido mecánicas de personalización antes de la partida y variabilidad en los enfrentamientos:
+
+    - Nombra a tu Héroe: Nueva pantalla interactiva para introducir y personalizar el nombre de tu personaje a través del teclado antes del combate.
+    - Jefes Aleatorios: El sistema ahora genera un jefe enemigo de clase aleatoria (Guerrero, Paladín o Pícaro) y le asigna un nombre temático en cada simulación para aumentar la rejugabilidad.
+
+---
 v2.0 Mejoras de interfaz, mapas y pociones aleatorios. Tratamiento de Excepciones.
 
     Se ha mejorado la interfaz moviendo el registro de batalla a la parte inferior para tener una mejor vision
