@@ -1,6 +1,8 @@
 import controladores.Controlador;
 import controladores.Jugador;
 import controladores.Maquina;
+import datos.GestorEstadisticas;
+import datos.RegistroPartida;
 import entidades.Entidad;
 import entidades.Guerrero;
 import entidades.Paladin;
@@ -153,7 +155,7 @@ public class Partida {
                 nombreUsuario = nombreUsuario.substring(0, nombreUsuario.length() - 1);
                 ventana.mostrarPantallaNombre(nombreUsuario);
             }
-            else if (codigoTecla >= 65 && codigoTecla <= 90) {
+            else if (codigoTecla >= KeyEvent.VK_A && codigoTecla <= KeyEvent.VK_Z) {
                 if (nombreUsuario.length() < 10) {
                     nombreUsuario += (char) codigoTecla;
                     nombreUsuario = Utiles.primeraMayus(nombreUsuario);
@@ -228,25 +230,32 @@ public class Partida {
     }
 
     private void verificarFinPartida() {
-        if (!heroe.getEstaVivo()) {
-            juegoTerminado = true;
+        boolean heroeMuerto = !heroe.getEstaVivo();
+        boolean jefeMuerto = !jefe.getEstaVivo();
+        //Si ambos siguen vivos salimos del metodo sin tocar el XML
+        if(!heroeMuerto && !jefeMuerto){
+            return;
+        }
+        //Si llega aquí es que alguien ha muerto
+        juegoTerminado = true;
+        int puntosFinales = 0;
+        if(heroeMuerto){
             registrarLog(">>> GAME OVER: El héroe ha caído...");
             ventana.cambiarColorMapa(Color.RED);
             ventana.actualizarPantalla(generarPantallaDerrota());
-            datos.GestorEstadisticas gestor = new datos.GestorEstadisticas();
-            String idPartida = gestor.obtenerSiguienteId(); // <-- Pedimos el ID secuencial
-            datos.RegistroPartida registro = new datos.RegistroPartida(idPartida, heroe.getNombre(), heroe.getClass().getSimpleName(), jefe.getNombre(), jefe.getClass().getSimpleName(), 0);
-            gestor.guardarPartida(registro);
-        } else if (!jefe.getEstaVivo()) {
-            juegoTerminado = true;
-            int puntosFinales = Math.max(0, 1000 - (this.turnosTotales * 10));
-            registrarLog(">>> ¡VICTORIA! La amenaza ha sido eliminada en "+this.turnosTotales+" turnos.");
+        }else{
+            puntosFinales = Math.max(0, 1000 - (this.turnosTotales * 10));
+            registrarLog(">>> ¡VICTORIA! La amenaza ha sido eliminada en " + this.turnosTotales + " turnos.");
             ventana.cambiarColorMapa(Color.YELLOW);
             ventana.actualizarPantalla(generarPantallaVictoria(puntosFinales));
-            datos.GestorEstadisticas gestor = new datos.GestorEstadisticas();
-            String idPartida = gestor.obtenerSiguienteId(); // <-- Pedimos el ID secuencial
-            datos.RegistroPartida registro = new datos.RegistroPartida(idPartida, heroe.getNombre(), heroe.getClass().getSimpleName(), jefe.getNombre(), jefe.getClass().getSimpleName(), puntosFinales);
+        }
+        try {
+            GestorEstadisticas gestor = new GestorEstadisticas();
+            String idPartida = gestor.obtenerSiguienteId();
+            RegistroPartida registro = new RegistroPartida(idPartida, heroe.getNombre(), heroe.getClass().getSimpleName(), jefe.getNombre(), jefe.getClass().getSimpleName(), puntosFinales);
             gestor.guardarPartida(registro);
+        } catch (Exception e) {
+            registrarLog("Error al procesar o guardar las estadísticas en el archivo XML.");
         }
     }
 
