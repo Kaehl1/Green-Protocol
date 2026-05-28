@@ -17,6 +17,11 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Motor central y controlador principal del juego.
+ * Gestiona la máquina de estados (menús, combate, fin de juego), el sistema de turnos,
+ * la generación procedimental de elementos y la persistencia de datos tras concluir una batalla.
+ */
 public class Partida {
     private VentanaJuego ventana;
     private Tablero tablero;
@@ -35,7 +40,14 @@ public class Partida {
     private Entidad claseElegidaTemp;
     private int turnosTotales = 0;
 
-
+    /**
+     * Inicializa el motor de partida con las configuraciones y entidades base,
+     * levantando la interfaz gráfica en su estado inicial.
+     *
+     * @param tablero Instancia del mapa donde se jugará.
+     * @param heroe Entidad controlada por el usuario (temporal hasta la selección real).
+     * @param jefe Entidad controlada por la máquina (temporal hasta la asignación aleatoria).
+     */
     public Partida(Tablero tablero, Entidad heroe, Entidad jefe) {
         this.tablero = tablero;
         this.heroe = heroe;
@@ -47,10 +59,20 @@ public class Partida {
         this.refrescarInterfaz();
     }
 
+    /**
+     * Añade un nuevo controlador (Jugador o Máquina) a la cola de turnos de la partida.
+     *
+     * @param c El controlador a registrar.
+     */
     public void agregarControlador(Controlador c) {
         this.controladores.add(c);
     }
 
+    /**
+     * Procesa la transición entre turnos.
+     * Si es el turno del jugador, actualiza estados y gestiona la aparición aleatoria de pociones.
+     * Si es el turno de la máquina, ejecuta la IA mediante un temporizador asíncrono para mostrar el movimiento visualmente.
+     */
     public void avanzarTurno() {
         turnoActual++;
         if (turnoActual == controladores.size()) {
@@ -108,6 +130,12 @@ public class Partida {
         }
     }
 
+    /**
+     * Motor de eventos de entrada. Intercepta las teclas pulsadas por el usuario y deriva la acción
+     * basándose en el estado actual de la máquina de estados (Menú, Selección, Nombre, Combate o Fin).
+     *
+     * @param codigoTecla El identificador numérico de la tecla pulsada extraído de KeyEvent.
+     */
     public void gestionarTecla(int codigoTecla) {
         //En el menu principal
         if(enMenu){
@@ -225,10 +253,20 @@ public class Partida {
         }
     }
 
+    /**
+     * Obtiene el estado actual del mapa físico desde el Tablero.
+     *
+     * @return Cadena de texto formateada que representa gráficamente el mapa y sus elementos.
+     */
     private String actualizarMapa() {
         return tablero.generarMapaTexto();
     }
 
+    /**
+     * Evalúa las condiciones de victoria o derrota después de un ataque.
+     * Si el combate ha concluido, calcula la puntuación contrarreloj, detiene el bucle de turnos,
+     * e inicia el guardado persistente invocando a GestorEstadisticas.
+     */
     private void verificarFinPartida() {
         boolean heroeMuerto = !heroe.getEstaVivo();
         boolean jefeMuerto = !jefe.getEstaVivo();
@@ -259,6 +297,12 @@ public class Partida {
         }
     }
 
+    /**
+     * Construye el diseño ASCII y el mensaje de fin de juego por victoria.
+     *
+     * @param puntos Los puntos obtenidos tras el cálculo final contrarreloj.
+     * @return El bloque de texto formateado listo para inyectar en la interfaz gráfica.
+     */
     private String generarPantallaVictoria(int puntos) {
         return "\n\n" +
                 "          ___________          \n" +
@@ -276,6 +320,12 @@ public class Partida {
                 "          [Pulsa ENTER]          ";
     }
 
+    /**
+     * Construye el diseño ASCII y el mensaje de fin de juego por derrota,
+     * centrando dinámicamente el nombre del personaje en la lápida.
+     *
+     * @return El bloque de texto formateado listo para inyectar en la interfaz gráfica.
+     */
     private String generarPantallaDerrota() {
         String nombre = this.heroe.getNombre();
         int espaciosTotales = 15 - nombre.length();
@@ -297,16 +347,29 @@ public class Partida {
                 "         [Pulsa ENTER]            ";
     }
 
+    /**
+     * Actualiza las barras de información de la interfaz con los valores numéricos
+     * en tiempo real de la vida, movimiento y estados de los combatientes.
+     */
     private void refrescarInterfaz() {
         String statsHeroe = heroe.getNombre() + " [HP: " + heroe.getVidaActual() + "/" + heroe.getVidaMax() + " | Mov: " + heroe.getMovimientoActual() + " | Est: " + heroe.obtenerEstado() + "]";
         String statsJefe = jefe.getNombre() + " [HP: " + jefe.getVidaActual() + "/" + jefe.getVidaMax() + " | Mov: " + jefe.getMovimientoActual() + " | Est: " + jefe.obtenerEstado() + "]";
         this.ventana.actualizarStats(statsHeroe, statsJefe);
     }
 
+    /**
+     * Envía un mensaje de texto para ser apilado y mostrado en el panel visual de eventos del combate.
+     *
+     * @param mensaje Cadena de texto a imprimir.
+     */
     public void registrarLog(String mensaje) {
         this.ventana.imprimirLog(mensaje);
     }
 
+    /**
+     * Proceso de purga que restablece todos los atributos matemáticos, temporizadores,
+     * posiciones y registros del mapa necesarios antes de iniciar un enfrentamiento desde cero.
+     */
     private void reiniciarPartida() {
         this.juegoTerminado = false;
         this.turnoActual = 0;
@@ -340,6 +403,12 @@ public class Partida {
         registrarLog("SISTEMA: INICIANDO NUEVA SIMULACIÓN...");
     }
 
+    /**
+     * Configura y ensambla una simulación nueva instanciando al héroe y asignando aleatoriamente
+     * la clase y el nombre del jefe enemigo, para después empujar el estado del juego al combate activo.
+     *
+     * @param nuevaClase La entidad molde elegida por el usuario con su nombre introducido aplicado.
+     */
     private void configurarNuevaPartida(Entidad nuevaClase) {
         String[]nombres={"Vaarun", "Orionis", "Malakor", "Krux", "Bazaal"};
         int indiceNombre = rand.nextInt(nombres.length);

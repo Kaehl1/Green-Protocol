@@ -4,6 +4,11 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+/**
+ * Clase que gestiona la Interfaz Gráfica de Usuario del juego.
+ * Hereda de JFrame y actúa como la "Vista" en el patrón Modelo-Vista-Controlador, encargándose de renderizar
+ * los diferentes menús, el tablero ASCII, el registro de combate y capturar las teclas pulsadas.
+ */
 public class VentanaJuego extends JFrame implements KeyListener {
     private JTextArea areaTexto;
     private Partida partida;
@@ -15,7 +20,12 @@ public class VentanaJuego extends JFrame implements KeyListener {
     private JPanel panelJuego;
     private JPanel panelMenu;
 
-    // --- CONSTRUCTOR ---
+    /**
+     * Construye y configura la ventana principal del juego, inicializando todos los paneles,
+     * estilos, fuentes y el sistema de navegación por cartas (CardLayout).
+     *
+     * @param partida La instancia del motor principal que procesará los eventos de teclado capturados.
+     */
     public VentanaJuego(Partida partida) {
         this.partida = partida;
         setTitle("Green Protocol v1.0");
@@ -119,15 +129,31 @@ public class VentanaJuego extends JFrame implements KeyListener {
         setVisible(true);
     }
 
-    // --- MÉTODOS DE LA INTERFAZ ---
+    /**
+     * Refresca el lienzo principal sustituyendo el contenido por el mapa actualizado.
+     *
+     * @param mapaTexto El diseño del tablero en formato String.
+     */
     public void actualizarPantalla(String mapaTexto) {
         areaTexto.setText(mapaTexto);
     }
 
+    /**
+     * Actualiza la barra de información inferior con la vida y estados de ambos combatientes.
+     *
+     * @param textoHeroe Cadena de texto con las estadísticas formateadas del jugador.
+     * @param textoJefe Cadena de texto con las estadísticas formateadas del enemigo.
+     */
     public void actualizarStats(String textoHeroe, String textoJefe) {
         etiquetaStatsHeroe.setText(textoHeroe);
         etiquetaStatsJefe.setText(textoJefe);
     }
+
+    /**
+     * Añade un nuevo mensaje al cuadro de registro de batalla y hace scroll automático hacia abajo.
+     *
+     * @param mensaje El texto descriptivo del evento ocurrido a imprimir.
+     */
     public void imprimirLog(String mensaje) {
         if (mensaje != null && !mensaje.isEmpty()) {
             historialCombate.append(" > " + mensaje + "\n");
@@ -135,26 +161,49 @@ public class VentanaJuego extends JFrame implements KeyListener {
         }
     }
 
+    /**
+     * Modifica el color de la fuente del lienzo principal (útil para resaltar victorias o derrotas).
+     *
+     * @param color El nuevo objeto Color a aplicar al texto.
+     */
     public void cambiarColorMapa(Color color) {
         areaTexto.setForeground(color);
     }
 
+    /**
+     * Vacía completamente el cuadro de texto del historial de combate.
+     */
     public void limpiarHistorial() {
         historialCombate.setText("");
     }
 
+    /**
+     * Intercambia la tarjeta actual para mostrar la pantalla de título principal.
+     */
     public void mostrarMenu() {
         cardLayout.show(panelContenedor, "MENU");
     }
 
+    /**
+     * Intercambia la tarjeta actual para mostrar el lienzo interactivo del combate.
+     */
     public void mostrarJuego() {
         cardLayout.show(panelContenedor, "JUEGO");
     }
 
+    /**
+     * Intercambia la tarjeta actual para mostrar el menú de selección de clase.
+     */
     public void mostrarSeleccion() {
         cardLayout.show(panelContenedor, "SELECCION");
     }
 
+    /**
+     * Imprime en el lienzo principal la interfaz de creación de nombre renderizando
+     * en tiempo real los caracteres que pulsa el usuario.
+     *
+     * @param nombreTecleado El nombre parcial o total introducido hasta el momento.
+     */
     public void mostrarPantallaNombre(String nombreTecleado) {
         cambiarColorMapa(Color.GREEN);
         String pantalla = "\n\n\n\n\n\n" +
@@ -167,17 +216,27 @@ public class VentanaJuego extends JFrame implements KeyListener {
         actualizarPantalla(pantalla);
     }
 
-    // --- MÉTODOS DEL KEYLISTENER ---
+    /**
+     * Evento disparado automáticamente cuando se presiona físicamente una tecla.
+     * Delega el código numérico de la tecla capturada al cerebro de la Partida.
+     *
+     * @param e El evento de teclado generado por AWT.
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         int codigoTecla = e.getKeyCode();
         partida.gestionarTecla(codigoTecla);
     }
 
-    // Métodos son obligatorios por el "implements KeyListener"
+    /**
+     * Método sin uso implementado obligatoriamente por la interfaz KeyListener.
+     */
     @Override
     public void keyTyped(KeyEvent e) {}
 
+    /**
+     * Método sin uso implementado obligatoriamente por la interfaz KeyListener.
+     */
     @Override
     public void keyReleased(KeyEvent e) {}
 }

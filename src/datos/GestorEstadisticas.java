@@ -7,7 +7,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+/**
+ * Motor principal encargado de la persistencia de datos.
+ * Conecta el estado del juego con la base de datos local XML para registrar las estadísticas y el historial de las partidas.
+ */
 public class GestorEstadisticas {
+
+    /**
+     * Lee el archivo XML existente, inyecta la nueva partida justo antes del cierre de la etiqueta contenedora de partidas,
+     * y sobrescribe el documento de forma segura.
+     *
+     * @param registro Objeto que contiene todos los datos de la partida que acaba de finalizar.
+     * @throws IOException Si ocurre algún error durante la lectura o escritura del archivo físico.
+     */
     public void guardarPartida(RegistroPartida registro) throws IOException {
         Path ruta = Path.of("GreenProtocol.xml");
         ArrayList<String> contenidoMemoria = new ArrayList<>();
@@ -30,8 +42,12 @@ public class GestorEstadisticas {
         escritor.close();
     }
 
-    // --- METODOS AUXILIARES ---
-    // Transforma el objeto de datos en un bloque de texto formateado con etiquetas XML
+    /**
+     * Transforma los datos del objeto RegistroPartida en una estructura de texto formateada con etiquetas XML.
+     *
+     * @param partida El objeto con la información a formatear.
+     * @return Cadena de texto con el formato XML lista para ser inyectada en el archivo.
+     */
     private String generarStringXML(RegistroPartida partida) {
         return "            <partida id=\"" + partida.getId() + "\">\n" +
                 "                <nombreHeroe>" + partida.getNombreHeroe() + "</nombreHeroe>\n" +
@@ -44,7 +60,12 @@ public class GestorEstadisticas {
                 "            </partida>";
     }
 
-    // --- METODO PARA GENERAR ID SECUENCIAL ---
+    /**
+     * Escanea el archivo XML buscando el último identificador (ID) registrado para calcular el siguiente de forma secuencial.
+     *
+     * @return El siguiente identificador disponible en formato String de 3 dígitos (ejemplo: "001").
+     * @throws IOException Sí ocurre un error al intentar acceder o leer el archivo local.
+     */
     public String obtenerSiguienteId() throws IOException {
         Path ruta = Path.of("GreenProtocol.xml");
         int maxId = 0; // Si no hay partidas, empezará en 0
